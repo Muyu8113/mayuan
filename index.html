@@ -63,6 +63,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			cursor: pointer;
 		}
 
 		.logoImage {
@@ -83,12 +84,39 @@
 				transform: translateY(0);
 			}
 		}
+
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(-5rem);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
 	</style>
 </head>
 
 <body>
 	<div id="loadMark">
 		<div style=" display: flex; justify-content: center; align-items: center; flex-direction: column;">
+			<div style="overflow: hidden; margin: 3rem;">
+				<h1 style="
+		margin: 0;
+		animation: fadeInUp 1s ease-in forwards;
+		text-align: center;
+		background: linear-gradient(to right, #D16BA5, #86A8E7, #5FFBF1);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		display: inline-block;
+		font-family: monospace;
+		border-right: 2px solid transparent; /* 光标 */
+		font-size: 3rem;
+	">马原刷题工具</h1>
+			</div>
 			<div style="display: flex; justify-content: center; align-items: center; overflow: hidden;">
 				<img src=" ./image/muyu_logo.png" alt="" style="width: 15rem; border-radius: 100%;" class="logoImage">
 				<img src="./image/leessmin_logo.jpg" alt="" style="width: 8rem;border-radius: 100%;" class="logoImage">
@@ -103,6 +131,7 @@
     font-family: monospace;
     border-right: 2px solid transparent; /* 光标 */
 "></h1>
+			<h3 id="enterText" style="color: white; opacity: 0; transition: all .5s;">点击进入</h3>
 		</div>
 	</div>
 	<script>
@@ -124,12 +153,14 @@
 			typeWriter()
 
 			setTimeout(() => {
-
-				document.body.style.overflow = "auto"
-				document.startViewTransition(() => {
-					document.querySelector("#loadMark").style.display = "none"
-				})
-			}, 2500)
+				document.querySelector("#enterText").style.opacity = 1;
+				document.querySelector("#loadMark").onclick = () => {
+					document.body.style.overflow = "auto"
+					document.startViewTransition(() => {
+						document.querySelector("#loadMark").style.display = "none"
+					})
+				}
+			}, 2000)
 		})
 
 	</script>
