@@ -84,7 +84,6 @@ function shuffleArray(array) {
 // 刷题逻辑的核心工厂函数
 function createBrushLogic(isWrongSetMode = false) {
     return {
-        allQuestions: [],
         practicePool: [],
         currentQuestionIndex: -1,
         currentQuestion: null,
@@ -92,11 +91,12 @@ function createBrushLogic(isWrongSetMode = false) {
         isPracticeStarted: false,
         isAnswerChecked: false,
         isCorrect: false,
-        showNewSectionHeader: false,
         stats: {correct: 0, incorrect: 0, total: 0},
         autoNextTimeout: null,
         counts: {single: 0, multiple: 0, judge: 0, total: 0},
         isEmpty: true,
+        // 用于存储每道题的作答状态
+        answerHistory: {},
 
         get displayQuestionText() {
             if (!this.currentQuestion) return '';
@@ -104,12 +104,24 @@ function createBrushLogic(isWrongSetMode = false) {
             return `${this.currentQuestionIndex + 1}. ${questionWithoutOldNumber}`;
         },
 
+        get sectionTitle() {
+            if (!this.currentQuestion) return '';
+            switch (this.currentQuestion.type) {
+                case 'single':
+                    return '--- 第一部分：单选题 ---';
+                case 'multiple':
+                    return '--- 第二部分：多选题 ---';
+                case 'judge':
+                    return '--- 第三部分：判断题 ---';
+                default:
+                    return '';
+            }
+        },
+
         init(allParsedQuestions = null) {
+            this.allQuestions = allParsedQuestions || [];
             if (isWrongSetMode) {
                 this.checkWrongSetCounts();
-                this.isEmpty = this.counts.total === 0;
-            } else if (allParsedQuestions) {
-                this.allQuestions = allParsedQuestions;
             }
         },
 
@@ -117,8 +129,9 @@ function createBrushLogic(isWrongSetMode = false) {
             if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
             this.isPracticeStarted = false;
             this.currentQuestion = null;
+            this.answerHistory = {}; // 重置时清空历史
             if (isWrongSetMode) {
-                this.init(); // 重新加载错题
+                this.checkWrongSetCounts();
             }
         },
 
@@ -134,7 +147,7 @@ function createBrushLogic(isWrongSetMode = false) {
         },
 
         startPracticeByType(type) {
-            if (isWrongSetMode) this.checkWrongSetCounts(); // 开始前再次检查最新的错题
+            if (isWrongSetMode) this.checkWrongSetCounts();
             let source = this.allQuestions;
 
             if (type === 'all') {
@@ -157,21 +170,53 @@ function createBrushLogic(isWrongSetMode = false) {
             this.currentQuestionIndex = -1;
             this.stats.correct = 0;
             this.stats.incorrect = 0;
-            this.nextQuestion();
+            this.answerHistory = {};
+            this.loadQuestion(0);
         },
 
         loadQuestion(index) {
             if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
-            if (index >= this.practicePool.length) {
+
+            this.currentQuestionIndex = index;
+
+            if (index < 0 || index >= this.practicePool.length) {
                 this.currentQuestion = null;
+                // 如果是超出最后一题，则判断为练习完成
+                if (index >= this.practicePool.length && this.isPracticeStarted) {
+                    this.isPracticeStarted = false; // 标记练习结束
+                    // 需要一个变量来显示结束画面，我们暂时先让currentQuestion为null
+                }
                 return;
             }
+
             this.currentQuestion = this.practicePool[index];
-            const prevType = index > 0 ? this.practicePool[index - 1].type : null;
-            this.showNewSectionHeader = (index === 0) || (this.currentQuestion.type !== prevType);
-            this.isAnswerChecked = false;
-            this.isCorrect = false;
-            this.userSelection = this.currentQuestion.type === 'multiple' ? [] : '';
+
+            // 恢复历史作答状态
+            const history = this.answerHistory[index];
+            if (history) {
+                this.isAnswerChecked = true;
+                this.isCorrect = history.isCorrect;
+                this.userSelection = history.userSelection;
+            } else {
+                this.isAnswerChecked = false;
+                this.isCorrect = false;
+                this.userSelection = this.currentQuestion.type === 'multiple' ? [] : '';
+            }
+        },
+
+        prevQuestion() {
+            if (this.currentQuestionIndex > 0) {
+                this.loadQuestion(this.currentQuestionIndex - 1);
+            }
+        },
+
+        nextQuestion() {
+            if (this.currentQuestionIndex < this.practicePool.length - 1) {
+                this.loadQuestion(this.currentQuestionIndex + 1);
+            } else {
+                // 最后一题，显示完成界面
+                this.currentQuestion = null;
+            }
         },
 
         selectAndCheck(selection) {
@@ -180,13 +225,8 @@ function createBrushLogic(isWrongSetMode = false) {
             this.checkAnswer(true);
         },
 
-        nextQuestion() {
-            this.currentQuestionIndex++;
-            this.loadQuestion(this.currentQuestionIndex);
-        },
-
         checkAnswer(isAutoCheck = false) {
-            if (!this.currentQuestion) return;
+            if (!this.currentQuestion || this.isAnswerChecked) return;
             if (this.currentQuestion.type === 'multiple' && this.userSelection.length === 0) {
                 alert('请选择答案。');
                 return;
@@ -202,31 +242,41 @@ function createBrushLogic(isWrongSetMode = false) {
             }
             this.isCorrect = isCorrect;
 
-            if (isCorrect) {
-                this.stats.correct++;
-            } else {
-                this.stats.incorrect++;
+            // 记录到历史，并更新统计
+            if (!this.answerHistory[this.currentQuestionIndex]) {
+                if (isCorrect) {
+                    this.stats.correct++;
+                } else {
+                    this.stats.incorrect++;
+                }
+
+                // 错题本逻辑
+                if (isWrongSetMode) {
+                    const wrongSet = getWrongSet();
+                    const itemIndex = wrongSet.findIndex(item => item.question[0] === this.currentQuestion.question);
+                    if (itemIndex > -1) {
+                        if (isCorrect) {
+                            wrongSet[itemIndex].consecutiveCorrect++;
+                            if (wrongSet[itemIndex].consecutiveCorrect >= 3) {
+                                wrongSet.splice(itemIndex, 1);
+                            }
+                        } else {
+                            wrongSet[itemIndex].consecutiveCorrect = 0;
+                        }
+                        saveWrongSet(wrongSet);
+                    }
+                } else {
+                    if (!isCorrect) {
+                        addQuestionToWrongSet(this.currentQuestion.originalData);
+                    }
+                }
             }
 
-            if (isWrongSetMode) {
-                const wrongSet = getWrongSet();
-                const itemIndex = wrongSet.findIndex(item => item.question[0] === this.currentQuestion.question);
-                if (itemIndex > -1) {
-                    if (isCorrect) {
-                        wrongSet[itemIndex].consecutiveCorrect++;
-                        if (wrongSet[itemIndex].consecutiveCorrect >= 3) {
-                            wrongSet.splice(itemIndex, 1);
-                        }
-                    } else {
-                        wrongSet[itemIndex].consecutiveCorrect = 0;
-                    }
-                    saveWrongSet(wrongSet);
-                }
-            } else {
-                if (!isCorrect) {
-                    addQuestionToWrongSet(this.currentQuestion.originalData);
-                }
-            }
+            this.answerHistory[this.currentQuestionIndex] = {
+                userSelection: this.userSelection,
+                isCorrect: this.isCorrect
+            };
+
 
             if (isAutoCheck && this.currentQuestion.type !== 'multiple') {
                 this.autoNextTimeout = setTimeout(() => this.nextQuestion(), 1200);
@@ -264,7 +314,6 @@ document.addEventListener('alpine:init', () => {
                 .map(q => parseQuestion(q))
                 .filter(q => q !== null);
 
-            // 直接创建和初始化对象，不再使用null
             this.brush = createBrushLogic(false);
             this.wrongBrush = createBrushLogic(true);
 
