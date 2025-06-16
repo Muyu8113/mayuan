@@ -128,7 +128,7 @@
                             </button>
                             <button @click="brush.checkAnswer()"
                                     x-show="brush.currentQuestion.type === 'multiple' && !brush.isAnswerChecked"
-                                    class="btn btn-primary">返回
+                                    class="btn btn-primary">提交
                             </button>
                             <button @click="brush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
                         </div>
@@ -235,7 +235,7 @@
                             </button>
                             <button @click="wrongBrush.checkAnswer()"
                                     x-show="wrongBrush.currentQuestion.type === 'multiple' && !wrongBrush.isAnswerChecked"
-                                    class="btn btn-primary">返回
+                                    class="btn btn-primary">提交
                             </button>
                             <button @click="wrongBrush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
                         </div>
