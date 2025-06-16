@@ -286,6 +286,7 @@ document.addEventListener('alpine:init', () => {
         brush: {},
         wrongBrush: {},
         isDark: false,
+        showScrollTop: false,
 
         init() {
             this.allParsedQuestions = window.answer.flatMap(ch => ch.list)
@@ -307,6 +308,19 @@ document.addEventListener('alpine:init', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             this.isDark = savedTheme === 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
+
+            window.addEventListener('scroll', () => this.handleScroll());
+        },
+
+        handleScroll() {
+            this.showScrollTop = window.scrollY > 400;
+        },
+
+        scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         },
 
         toggleTheme() {

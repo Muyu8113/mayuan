@@ -1,6 +1,6 @@
+/* --- 1. 全局与主题变量 --- */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
 
-/* --- 1. 全局与主题变量 --- */
 :root {
     --theme-bg: #f8f9fa;
     --theme-bg-secondary: #ffffff;
@@ -36,6 +36,10 @@ html[data-theme='dark'] {
 }
 
 /* --- 2. 基础样式与布局 --- */
+html {
+    scroll-behavior: smooth; /* 让滚动更平滑 */
+}
+
 body {
     background-color: var(--theme-bg);
     color: var(--theme-text-primary);
@@ -180,26 +184,22 @@ html[data-theme='dark'] .btn.btn-neutral {
     border: 1px solid var(--theme-border);
 }
 
-/* V V V 这里是本次修复的核心 V V V */
 .flex-container {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    flex-wrap: wrap; /* 允许换行 */
+    flex-wrap: wrap;
 }
 
 .flex-container .btn {
-    flex-grow: 1; /* 在大屏幕上，让按钮平均分配空间 */
+    flex-grow: 1;
 }
 
 @media (min-width: 640px) {
-    /* 在大于等于 640px 的屏幕上，恢复原始行为 */
     .flex-container .btn {
         flex-grow: 0;
     }
 }
-
-/* A A A 这里是本次修复的核心 A A A */
 
 .collapse-wrapper {
     background-color: var(--theme-bg-secondary);
@@ -387,25 +387,23 @@ html[data-theme='dark'] .btn.btn-neutral {
     text-align: center;
 }
 
-/* V V V 这里是本次修复的核心 V V V */
 .actions-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 1.5rem;
-    flex-wrap: wrap; /* 允许换行 */
-    gap: 0.5rem; /* 为换行后的按钮增加间距 */
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .actions-footer .btn-group {
     display: flex;
     gap: 0.5rem;
-    flex-grow: 1; /* 在小屏幕上，让按钮组占据整行 */
+    flex-grow: 1;
     justify-content: flex-end;
 }
 
 @media (max-width: 420px) {
-    /* 在非常窄的屏幕上，让按钮垂直排列 */
     .actions-footer .btn-group {
         flex-direction: column;
         width: 100%;
@@ -416,9 +414,6 @@ html[data-theme='dark'] .btn.btn-neutral {
         justify-content: center;
     }
 }
-
-/* A A A 这里是本次修复的核心 A A A */
-
 
 .completion-card, .empty-state {
     text-align: center;
@@ -531,4 +526,20 @@ html[data-theme='dark'] .btn.btn-neutral {
 .checkbox:checked {
     background-color: var(--theme-primary);
     border-color: var(--theme-primary);
+}
+
+
+/* --- 7. 回到顶部按钮 --- */
+.scroll-to-top {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    box-shadow: var(--theme-shadow);
+    z-index: 99;
 }
