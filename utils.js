@@ -81,9 +81,9 @@ function shuffleArray(array) {
     return array;
 }
 
-// 刷题逻辑的核心工厂函数
 function createBrushLogic(isWrongSetMode = false) {
     return {
+        allQuestions: [],
         practicePool: [],
         currentQuestionIndex: -1,
         currentQuestion: null,
@@ -95,7 +95,6 @@ function createBrushLogic(isWrongSetMode = false) {
         autoNextTimeout: null,
         counts: {single: 0, multiple: 0, judge: 0, total: 0},
         isEmpty: true,
-        // 用于存储每道题的作答状态
         answerHistory: {},
 
         get displayQuestionText() {
@@ -108,11 +107,11 @@ function createBrushLogic(isWrongSetMode = false) {
             if (!this.currentQuestion) return '';
             switch (this.currentQuestion.type) {
                 case 'single':
-                    return '--- 第一部分：单选题 ---';
+                    return '--- 单选题 ---';
                 case 'multiple':
-                    return '--- 第二部分：多选题 ---';
+                    return '--- 多选题 ---';
                 case 'judge':
-                    return '--- 第三部分：判断题 ---';
+                    return '--- 判断题 ---';
                 default:
                     return '';
             }
@@ -129,7 +128,7 @@ function createBrushLogic(isWrongSetMode = false) {
             if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
             this.isPracticeStarted = false;
             this.currentQuestion = null;
-            this.answerHistory = {}; // 重置时清空历史
+            this.answerHistory = {};
             if (isWrongSetMode) {
                 this.checkWrongSetCounts();
             }
@@ -149,7 +148,6 @@ function createBrushLogic(isWrongSetMode = false) {
         startPracticeByType(type) {
             if (isWrongSetMode) this.checkWrongSetCounts();
             let source = this.allQuestions;
-
             if (type === 'all') {
                 const singles = source.filter(q => q.type === 'single');
                 const multiples = source.filter(q => q.type === 'multiple');
@@ -158,11 +156,8 @@ function createBrushLogic(isWrongSetMode = false) {
             } else {
                 this.practicePool = shuffleArray(source.filter(q => q.type === type));
             }
-
             this.stats.total = this.practicePool.length;
-            if (this.stats.total > 0) {
-                this.startPractice();
-            }
+            if (this.stats.total > 0) this.startPractice();
         },
 
         startPractice() {
@@ -176,22 +171,12 @@ function createBrushLogic(isWrongSetMode = false) {
 
         loadQuestion(index) {
             if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
-
             this.currentQuestionIndex = index;
-
             if (index < 0 || index >= this.practicePool.length) {
                 this.currentQuestion = null;
-                // 如果是超出最后一题，则判断为练习完成
-                if (index >= this.practicePool.length && this.isPracticeStarted) {
-                    this.isPracticeStarted = false; // 标记练习结束
-                    // 需要一个变量来显示结束画面，我们暂时先让currentQuestion为null
-                }
                 return;
             }
-
             this.currentQuestion = this.practicePool[index];
-
-            // 恢复历史作答状态
             const history = this.answerHistory[index];
             if (history) {
                 this.isAnswerChecked = true;
@@ -211,11 +196,10 @@ function createBrushLogic(isWrongSetMode = false) {
         },
 
         nextQuestion() {
-            if (this.currentQuestionIndex < this.practicePool.length - 1) {
-                this.loadQuestion(this.currentQuestionIndex + 1);
-            } else {
-                // 最后一题，显示完成界面
+            if (this.currentQuestionIndex >= this.practicePool.length - 1) {
                 this.currentQuestion = null;
+            } else {
+                this.loadQuestion(this.currentQuestionIndex + 1);
             }
         },
 
@@ -242,33 +226,27 @@ function createBrushLogic(isWrongSetMode = false) {
             }
             this.isCorrect = isCorrect;
 
-            // 记录到历史，并更新统计
             if (!this.answerHistory[this.currentQuestionIndex]) {
-                if (isCorrect) {
-                    this.stats.correct++;
-                } else {
-                    this.stats.incorrect++;
-                }
+                if (isCorrect) this.stats.correct++; else this.stats.incorrect++;
+                if (!isWrongSetMode && !isCorrect) addQuestionToWrongSet(this.currentQuestion.originalData);
+            }
 
-                // 错题本逻辑
-                if (isWrongSetMode) {
-                    const wrongSet = getWrongSet();
-                    const itemIndex = wrongSet.findIndex(item => item.question[0] === this.currentQuestion.question);
-                    if (itemIndex > -1) {
-                        if (isCorrect) {
-                            wrongSet[itemIndex].consecutiveCorrect++;
-                            if (wrongSet[itemIndex].consecutiveCorrect >= 3) {
-                                wrongSet.splice(itemIndex, 1);
-                            }
-                        } else {
-                            wrongSet[itemIndex].consecutiveCorrect = 0;
-                        }
-                        saveWrongSet(wrongSet);
+            if (isWrongSetMode && this.answerHistory[this.currentQuestionIndex]?.isCorrect !== true && isCorrect) {
+                const wrongSet = getWrongSet();
+                const itemIndex = wrongSet.findIndex(item => item.question[0] === this.currentQuestion.question);
+                if (itemIndex > -1) {
+                    wrongSet[itemIndex].consecutiveCorrect = (wrongSet[itemIndex].consecutiveCorrect || 0) + 1;
+                    if (wrongSet[itemIndex].consecutiveCorrect >= 3) {
+                        wrongSet.splice(itemIndex, 1);
                     }
-                } else {
-                    if (!isCorrect) {
-                        addQuestionToWrongSet(this.currentQuestion.originalData);
-                    }
+                    saveWrongSet(wrongSet);
+                }
+            } else if (isWrongSetMode && !isCorrect) {
+                const wrongSet = getWrongSet();
+                const itemIndex = wrongSet.findIndex(item => item.question[0] === this.currentQuestion.question);
+                if (itemIndex > -1) {
+                    wrongSet[itemIndex].consecutiveCorrect = 0;
+                    saveWrongSet(wrongSet);
                 }
             }
 
@@ -277,14 +255,13 @@ function createBrushLogic(isWrongSetMode = false) {
                 isCorrect: this.isCorrect
             };
 
-
             if (isAutoCheck && this.currentQuestion.type !== 'multiple') {
                 this.autoNextTimeout = setTimeout(() => this.nextQuestion(), 1200);
             }
         },
 
         getOptionClass(option) {
-            if (!this.isAnswerChecked) return 'border-base-300';
+            if (!this.isAnswerChecked) return '';
             const optionChar = option.charAt(0);
             const isCorrectAnswer = this.currentQuestion.correctAnswer.includes(optionChar);
             let isSelected = false;
@@ -293,9 +270,9 @@ function createBrushLogic(isWrongSetMode = false) {
             } else {
                 isSelected = this.userSelection === optionChar;
             }
-            if (isCorrectAnswer) return 'text-green-500 font-semibold border-green-500 bg-green-500/10';
-            if (isSelected && !isCorrectAnswer) return 'text-red-500 border-red-500 bg-red-500/10';
-            return 'border-base-300';
+            if (isCorrectAnswer) return 'option-label-correct';
+            if (isSelected && !isCorrectAnswer) return 'option-label-incorrect';
+            return '';
         },
     }
 }
@@ -308,6 +285,7 @@ document.addEventListener('alpine:init', () => {
         wrongQuestionCount: 0,
         brush: {},
         wrongBrush: {},
+        isDark: false,
 
         init() {
             this.allParsedQuestions = window.answer.flatMap(ch => ch.list)
@@ -325,6 +303,16 @@ document.addEventListener('alpine:init', () => {
                 this.updateWrongCount();
                 this.wrongBrush.checkWrongSetCounts();
             });
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            this.isDark = savedTheme === 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        },
+
+        toggleTheme() {
+            const newTheme = this.isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
         },
 
         updateWrongCount() {

@@ -1,0 +1,534 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+/* --- 1. 全局与主题变量 --- */
+:root {
+    --theme-bg: #f8f9fa;
+    --theme-bg-secondary: #ffffff;
+    --theme-bg-accent: #f1f3f5;
+    --theme-text-primary: #212529;
+    --theme-text-secondary: #6c757d;
+    --theme-border: #dee2e6;
+    --theme-primary: #0d6efd;
+    --theme-primary-hover: #0b5ed7;
+    --theme-secondary: #6c757d;
+    --theme-secondary-hover: #5c636a;
+    --theme-green: #198754;
+    --theme-red: #dc3545;
+    --theme-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --theme-radius: 0.75rem;
+    --font-family: 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+}
+
+html[data-theme='dark'] {
+    --theme-bg: #121212;
+    --theme-bg-secondary: #1e1e1e;
+    --theme-bg-accent: #2a2a2a;
+    --theme-text-primary: #e9ecef;
+    --theme-text-secondary: #adb5bd;
+    --theme-border: #343a40;
+    --theme-primary: #4f8bf9;
+    --theme-primary-hover: #72a2f9;
+    --theme-secondary: #5a6470;
+    --theme-secondary-hover: #697380;
+    --theme-green: #28a745;
+    --theme-red: #f04e4e;
+    --theme-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- 2. 基础样式与布局 --- */
+body {
+    background-color: var(--theme-bg);
+    color: var(--theme-text-primary);
+    font-family: var(--font-family);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 1rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.main-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.card {
+    background-color: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius);
+    box-shadow: var(--theme-shadow);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.header {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+.header h1 {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    text-align: center;
+    font-size: clamp(0.875rem, 3vw, 1rem);
+    margin-bottom: 2rem;
+    color: var(--theme-text-secondary);
+}
+
+/* --- 3. 组件样式 --- */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn.btn-primary {
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+    color: white;
+}
+
+.btn.btn-primary:hover {
+    background-color: var(--theme-primary-hover);
+    border-color: var(--theme-primary-hover);
+}
+
+.btn.btn-secondary {
+    background-color: var(--theme-secondary);
+    border-color: var(--theme-secondary);
+    color: white;
+}
+
+.btn.btn-secondary:hover {
+    background-color: var(--theme-secondary-hover);
+    border-color: var(--theme-secondary-hover);
+}
+
+.btn.btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--theme-text-secondary);
+}
+
+.btn.btn-ghost:hover {
+    background-color: var(--theme-bg-accent);
+}
+
+.btn.btn-outline {
+    background-color: transparent;
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+}
+
+.btn.btn-outline:hover {
+    background-color: var(--theme-primary);
+    color: white;
+}
+
+.btn.btn-neutral {
+    background-color: #333;
+    color: white;
+}
+
+html[data-theme='dark'] .btn.btn-neutral {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.badge {
+    background-color: var(--theme-bg-accent);
+    color: var(--theme-text-secondary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.25rem;
+}
+
+/* --- 4. 交互元素 --- */
+.mode-switcher {
+    background-color: var(--theme-bg-secondary);
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+    border-radius: var(--theme-radius);
+    border: 1px solid var(--theme-border);
+}
+
+/* V V V 这里是本次修复的核心 V V V */
+.flex-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap; /* 允许换行 */
+}
+
+.flex-container .btn {
+    flex-grow: 1; /* 在大屏幕上，让按钮平均分配空间 */
+}
+
+@media (min-width: 640px) {
+    /* 在大于等于 640px 的屏幕上，恢复原始行为 */
+    .flex-container .btn {
+        flex-grow: 0;
+    }
+}
+
+/* A A A 这里是本次修复的核心 A A A */
+
+.collapse-wrapper {
+    background-color: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.collapse-checkbox {
+    display: none;
+}
+
+.collapse-title {
+    font-size: 1.15rem;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: block;
+    position: relative;
+}
+
+.collapse-title::after {
+    content: '›';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transition: transform 0.3s ease;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--theme-text-secondary);
+}
+
+.collapse-checkbox:checked + .collapse-title::after {
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+.collapse-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+    padding: 0 1.5rem;
+}
+
+.collapse-checkbox:checked ~ .collapse-content {
+    max-height: 1000vh;
+    transition: max-height 1s ease-in-out;
+}
+
+.question-item {
+    border-top: 1px solid var(--theme-border);
+    padding: 1rem 0;
+}
+
+.question-item:first-child {
+    border-top: none;
+}
+
+.options-preview {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.answer-preview {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--theme-green);
+}
+
+
+/* --- 5. 刷题界面 --- */
+.question-card-body {
+    padding: 1.5rem;
+}
+
+.question-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.question-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.question-stats {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--theme-text-secondary);
+    white-space: nowrap;
+}
+
+.question-content-wrapper {
+    background-color: var(--theme-bg-accent);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--theme-bg-secondary);
+}
+
+.option-label:hover {
+    border-color: var(--theme-primary);
+    background-color: color-mix(in srgb, var(--theme-primary) 8%, transparent);
+}
+
+.option-label.option-label-correct {
+    border-color: var(--theme-green) !important;
+    background-color: color-mix(in srgb, var(--theme-green) 12%, transparent);
+    color: var(--theme-green);
+    font-weight: 700;
+}
+
+.option-label.option-label-incorrect {
+    border-color: var(--theme-red) !important;
+    background-color: color-mix(in srgb, var(--theme-red) 12%, transparent);
+    color: var(--theme-red);
+    font-weight: 700;
+}
+
+.answer-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+}
+
+.answer-feedback.correct {
+    background-color: color-mix(in srgb, var(--theme-green) 12%, transparent);
+    color: var(--theme-green);
+}
+
+.answer-feedback.incorrect {
+    background-color: color-mix(in srgb, var(--theme-red) 12%, transparent);
+    color: var(--theme-red);
+}
+
+.text-green-highlight {
+    color: var(--theme-green);
+    font-weight: 700;
+}
+
+.text-red-highlight {
+    color: var(--theme-red);
+}
+
+.section-header {
+    background-color: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+    color: var(--theme-primary);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin: 1.5rem 0;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* V V V 这里是本次修复的核心 V V V */
+.actions-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap; /* 允许换行 */
+    gap: 0.5rem; /* 为换行后的按钮增加间距 */
+}
+
+.actions-footer .btn-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-grow: 1; /* 在小屏幕上，让按钮组占据整行 */
+    justify-content: flex-end;
+}
+
+@media (max-width: 420px) {
+    /* 在非常窄的屏幕上，让按钮垂直排列 */
+    .actions-footer .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .actions-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* A A A 这里是本次修复的核心 A A A */
+
+
+.completion-card, .empty-state {
+    text-align: center;
+    padding: 2rem;
+}
+
+.completion-card h2, .empty-state .title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.completion-card p, .empty-state .subtitle {
+    margin: 1rem 0;
+    color: var(--theme-text-secondary);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.5rem auto;
+    max-width: 400px;
+    padding: 1rem;
+    background-color: var(--theme-bg-accent);
+    border-radius: 0.5rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-title {
+    font-size: 0.8rem;
+    color: var(--theme-text-secondary);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.empty-state .icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.type-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* --- 6. 主题切换器 --- */
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+}
+
+.theme-toggle .btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 999px;
+    background-color: var(--theme-bg-secondary);
+    box-shadow: var(--theme-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle input {
+    display: none;
+}
+
+.swap-on, .swap-off {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+}
+
+.swap input:checked ~ .swap-on {
+    display: inline-block;
+}
+
+.swap input:not(:checked) ~ .swap-on {
+    display: none;
+}
+
+.swap input:checked ~ .swap-off {
+    display: none;
+}
+
+.swap input:not(:checked) ~ .swap-off {
+    display: inline-block;
+}
+
+.checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--theme-border);
+    appearance: none;
+    cursor: pointer;
+}
+
+.checkbox:checked {
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+}
