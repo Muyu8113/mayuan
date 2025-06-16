@@ -56,7 +56,7 @@
 		#loadMark {
 			width: 100%;
 			height: 100vh;
-			position: absolute;
+			position: fixed;
 			top: 0;
 			left: 0;
 			background-color: #2D2F3F;
@@ -137,7 +137,8 @@
 	">马原刷题工具</h1>
 			</div>
 			<div style="display: flex; justify-content: center; align-items: center; overflow: hidden;">
-				<img src=" ./image/muyu_logo.png" alt="" style="width: 15rem; border-radius: 100%;" class="logoImage">
+				<img src="./image/muyu_logo.png" alt="" style="width: 8rem; border-radius: 100%;" class="logoImage">
+				<div style="width: 2rem"></div>
 				<img src="./image/leessmin_logo.jpg" alt="" style="width: 8rem;border-radius: 100%;" class="logoImage">
 			</div>
 			<h1 id="typing-text" style="
@@ -155,6 +156,8 @@
 	</div>
 	<script>
 		document.addEventListener("DOMContentLoaded", () => {
+
+
 			const text = "Power By muyu && Leessmin";
 			const element = document.getElementById("typing-text");
 			let i = 0;

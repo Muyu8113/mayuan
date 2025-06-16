@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="最新">
+    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="修复部分题目不显示问题">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/muyu_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/image/muyu_logo.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +35,7 @@
   <component name="ProjectId" id="2yaCYvLDu3814yHXaFQPKL721Fy" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -45,7 +46,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/Administrator/Desktop/Web/mayuan",
+    "last_opened_file_path": "C:/Users/Administrator/Desktop/Web/mayuan/image",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -55,6 +56,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Desktop\Web\mayuan\image" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -71,7 +77,7 @@
       <option name="presentableId" value="Default" />
       <updated>1750063347990</updated>
       <workItem from="1750063349174" duration="1590000" />
-      <workItem from="1750072220455" duration="1875000" />
+      <workItem from="1750072220455" duration="8597000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -97,7 +103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750064040642</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="修复部分题目不显示问题">
+      <option name="closed" value="true" />
+      <created>1750074295990</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1750074295990</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -107,6 +121,7 @@
     <MESSAGE value="init" />
     <MESSAGE value="添加项目忽略" />
     <MESSAGE value="最新" />
-    <option name="LAST_COMMIT_MESSAGE" value="最新" />
+    <MESSAGE value="修复部分题目不显示问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复部分题目不显示问题" />
   </component>
 </project>
