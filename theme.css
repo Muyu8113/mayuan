@@ -45,9 +45,10 @@ body {
     color: var(--theme-text-primary);
     font-family: var(--font-family);
     transition: background-color 0.3s ease, color 0.3s ease;
-    padding: 1rem;
+    padding: .6rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    margin: 0;
 }
 
 .main-container {
@@ -246,7 +247,7 @@ html[data-theme='dark'] .btn.btn-neutral {
 }
 
 .collapse-checkbox:checked ~ .collapse-content {
-    max-height: 1000vh;
+    max-height: fit-content;
     transition: max-height 1s ease-in-out;
 }
 
@@ -277,7 +278,7 @@ html[data-theme='dark'] .btn.btn-neutral {
 
 /* --- 5. 刷题界面 --- */
 .question-card-body {
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .question-header {
@@ -303,7 +304,7 @@ html[data-theme='dark'] .btn.btn-neutral {
 
 .question-content-wrapper {
     background-color: var(--theme-bg-accent);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 0.5rem;
 }
 

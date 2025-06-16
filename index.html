@@ -118,7 +118,7 @@
 	</style>
 </head>
 
-<body>
+<body style="overflow: hidden">
 	<div id="loadMark">
 		<div style=" display: flex; justify-content: center; align-items: center; flex-direction: column;">
 			<div style="overflow: hidden; margin: 3rem;">
@@ -155,8 +155,6 @@
 	</div>
 	<script>
 		document.addEventListener("DOMContentLoaded", () => {
-			document.body.style.overflow = "hidden"
-
 			const text = "Power By muyu && Leessmin";
 			const element = document.getElementById("typing-text");
 			let i = 0;
