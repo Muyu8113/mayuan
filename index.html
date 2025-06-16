@@ -2,212 +2,401 @@
 <html lang="zh-CN" data-theme="light">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>马原刷题工具</title>
-    <script src="//unpkg.com/alpinejs" defer></script>
-    <script src="./ans.js"></script>
-    <script src="./utils.js"></script>
-    <link rel="stylesheet" href="./theme.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>马原刷题工具</title>
+	<script src="//unpkg.com/alpinejs" defer></script>
+	<script src="./ans.js"></script>
+	<script src="./utils.js"></script>
+	<link rel="stylesheet" href="./theme.css">
+
+	<style>
+		@keyframes typing {
+			from {
+				width: 0
+			}
+
+			to {
+				width: 100%
+			}
+		}
+
+		@keyframes blink-caret {
+
+			from,
+			to {
+				border-color: transparent
+			}
+
+			50% {
+				border-color: white
+			}
+		}
+
+		@keyframes clip {
+			from {
+				clip-path: circle(0% at 50% 50%);
+			}
+
+			to {
+				clip-path: circle(100% at 50% 50%);
+			}
+		}
+
+		::view-transition-old(root) {
+			animation: none;
+		}
+
+		::view-transition-new(root) {
+			mix-blend-mode: normal;
+			animation: clip .8s ease-in;
+		}
+
+		#loadMark {
+			width: 100%;
+			height: 100vh;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background: url('./image/bg.png');
+			z-index: 999;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.logoImage {
+			width: 8rem;
+			border-radius: 100%;
+			opacity: 0;
+			animation: fadeIn 1s ease-in forwards;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(5rem);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+	</style>
 </head>
 
 <body>
-<div x-data="app()" x-init="init()" class="main-container">
+	<div id="loadMark">
+		<div style=" display: flex; justify-content: center; align-items: center; flex-direction: column;">
+			<div style="display: flex; justify-content: center; align-items: center; overflow: hidden;">
+				<img src=" ./image/muyu_logo.png" alt="" style="width: 15rem; border-radius: 100%;" class="logoImage">
+				<img src="./image/leessmin_logo.jpg" alt="" style="width: 8rem;border-radius: 100%;" class="logoImage">
+			</div>
+			<h1 id="typing-text" style="
+	text-align: center;
+    background: linear-gradient(to right, #ff8a00, #e52e71, #1e90ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-family: monospace;
+    border-right: 2px solid transparent; /* 光标 */
+"></h1>
+		</div>
+	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			document.body.style.overflow = "hidden"
 
-    <div class="theme-toggle">
-        <label class="swap swap-rotate btn">
-            <input type="checkbox" @change="toggleTheme" x-model="isDark"/>
-            <svg class="swap-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
-            <svg class="swap-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22a10.14,10.14,0,0,0,9.5,9.5A8.14,8.14,0,0,1,12.14,19.69Z"/></svg>
-        </label>
-    </div>
+			const text = "Power By muyu && Leessmin";
+			const element = document.getElementById("typing-text");
+			let i = 0;
+			function typeWriter() {
+				if (i < text.length) {
+					element.innerHTML += text.charAt(i);
+					i++;
+					setTimeout(typeWriter, 60);
+				} else {
+					element.style.borderRight = "none"; // 打字完成后隐藏光标
+				}
+			}
+			typeWriter()
 
-    <header class="header">
-        <h1>马原刷题工具</h1>
-        <p>一个清爽、高效的马克思主义基本原理刷题应用</p>
-    </header>
+			setTimeout(() => {
 
-    <div class="mode-switcher card">
-        <div class="flex-container">
-            <button @click="setMode('view')" class="btn" :class="mode === 'view' ? 'btn-primary' : 'btn-ghost'">📚 查看题库</button>
-            <button @click="setMode('brush')" class="btn" :class="mode === 'brush' ? 'btn-primary' : 'btn-ghost'">✍️ 随机刷题</button>
-            <button @click="setMode('wrong')" class="btn" :class="mode === 'wrong' ? 'btn-primary' : 'btn-ghost'">🔥 错题练习 <span class="badge" x-text="wrongQuestionCount"></span></button>
-        </div>
-    </div>
+				document.body.style.overflow = "auto"
+				document.startViewTransition(() => {
+					document.querySelector("#loadMark").style.display = "none"
+				})
+			}, 2500)
+		})
 
-    <!-- 查看题库 -->
-    <div x-show="mode === 'view'">
-        <template x-for="chapter in chapters" :key="chapter.name">
-            <div class="collapse-wrapper">
-                <input type="checkbox" :id="chapter.name" class="collapse-checkbox">
-                <label :for="chapter.name" class="collapse-title" x-text="chapter.name"></label>
-                <div class="collapse-content">
-                    <template x-for="(q, index) in chapter.list" :key="index">
-                        <div class="question-item">
-                            <p class="font-semibold" x-text="q[0]"></p>
-                            <div class="options-preview">
-                                <template x-for="item in q.slice(1, -2)">
-                                    <p :class="isHighlight(item, q[q.length - 2]) ? 'text-green-highlight' : ''" x-text="item"></p>
-                                </template>
-                            </div>
-                            <p class="answer-preview" x-text="q[q.length - 2]"></p>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </template>
-    </div>
+	</script>
 
-    <!-- 随机刷题 -->
-    <div x-show="mode === 'brush'">
-        <div x-show="!brush.isPracticeStarted" class="card empty-state">
-            <h3 class="title">开始新的挑战</h3>
-            <div class="type-selector">
-                <button @click="brush.startPracticeByType('single')" class="btn btn-outline">单选题</button>
-                <button @click="brush.startPracticeByType('multiple')" class="btn btn-outline">多选题</button>
-                <button @click="brush.startPracticeByType('judge')" class="btn btn-outline">判断题</button>
-                <button @click="brush.startPracticeByType('all')" class="btn btn-neutral">全部题型</button>
-            </div>
-        </div>
+	<div x-data="app()" x-init="init()" class="main-container">
 
-        <div x-show="brush.isPracticeStarted">
-            <div x-show="brush.currentQuestion" class="section-header" x-text="brush.sectionTitle" x-transition.opacity.duration.300ms></div>
-            <div x-show="brush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
-                <div class="question-card-body">
-                    <div class="question-header">
-                        <h2 class="question-title">随机练习</h2>
-                        <div class="question-stats">
-                            <span>进度: <span x-text="brush.currentQuestionIndex + 1"></span> / <span x-text="brush.stats.total"></span></span> |
-                            <span class="text-green-highlight">正确: <span x-text="brush.stats.correct"></span></span> |
-                            <span class="text-red-highlight">错误: <span x-text="brush.stats.incorrect"></span></span>
-                        </div>
-                    </div>
-                    <div class="question-content-wrapper">
-                        <p class="question-text" x-text="brush.displayQuestionText"></p>
-                        <div class="options-container">
-                            <template x-if="brush.currentQuestion.type === 'single' || brush.currentQuestion.type === 'judge'">
-                                <template x-for="option in brush.currentQuestion.options" :key="option">
-                                    <label @click.prevent="brush.selectAndCheck(option.charAt(0))" class="option-label" :class="brush.getOptionClass(option)"><span x-text="option"></span></label>
-                                </template>
-                            </template>
-                            <template x-if="brush.currentQuestion.type === 'multiple'">
-                                <template x-for="option in brush.currentQuestion.options" :key="option">
-                                    <label class="option-label" :class="brush.getOptionClass(option)">
-                                        <input type="checkbox" :value="option.charAt(0)" x-model="brush.userSelection" class="checkbox" :disabled="brush.isAnswerChecked">
-                                        <span x-text="option"></span>
-                                    </label>
-                                </template>
-                            </template>
-                        </div>
-                    </div>
-                    <div x-show="brush.isAnswerChecked" class="answer-feedback" :class="{ 'correct': brush.isCorrect, 'incorrect': !brush.isCorrect }" x-transition>
-                        正确答案: <span x-text="brush.currentQuestion.correctAnswer"></span>
-                    </div>
-                    <div class="actions-footer">
-                        <button @click="brush.reset()" class="btn btn-ghost">返回</button>
-                        <div class="btn-group">
-                            <button @click="brush.prevQuestion()" class="btn" :disabled="brush.currentQuestionIndex <= 0">← 上一题</button>
-                            <button @click="brush.checkAnswer()" x-show="brush.currentQuestion.type === 'multiple' && !brush.isAnswerChecked" class="btn btn-primary">提交</button>
-                            <button @click="brush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div x-show="!brush.currentQuestion && brush.isPracticeStarted" class="card completion-card" x-transition.opacity.duration.300ms>
-                <h2>🎉 练习完成! 🎉</h2>
-                <p>温故而知新，可以为师矣。</p>
-                <div class="stats-grid">
-                    <div class="stat-item"><div class="stat-title">总题数</div><div class="stat-value" x-text="brush.stats.total"></div></div>
-                    <div class="stat-item"><div class="stat-title">正确</div><div class="stat-value text-green-highlight" x-text="brush.stats.correct"></div></div>
-                    <div class="stat-item"><div class="stat-title">错误</div><div class="stat-value text-red-highlight" x-text="brush.stats.incorrect"></div></div>
-                </div>
-                <button @click="brush.reset()" class="btn btn-primary">再来一轮</button>
-            </div>
-        </div>
-    </div>
+		<div class="theme-toggle">
+			<label class="swap swap-rotate btn">
+				<input type="checkbox" @change="toggleTheme" x-model="isDark" />
+				<svg class="swap-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path
+						d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+				</svg>
+				<svg class="swap-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path
+						d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22a10.14,10.14,0,0,0,9.5,9.5A8.14,8.14,0,0,1,12.14,19.69Z" />
+				</svg>
+			</label>
+		</div>
 
-    <!-- 错题练习 -->
-    <div x-show="mode === 'wrong'">
-        <div x-show="!wrongBrush.isPracticeStarted && !wrongBrush.isEmpty" class="card empty-state">
-            <h3 class="title">温故知新，攻克难点</h3>
-            <div class="type-selector">
-                <button @click="wrongBrush.startPracticeByType('single')" class="btn btn-outline" :disabled="wrongBrush.counts.single === 0">单选题 <span class="badge" x-text="wrongBrush.counts.single"></span></button>
-                <button @click="wrongBrush.startPracticeByType('multiple')" class="btn btn-outline" :disabled="wrongBrush.counts.multiple === 0">多选题 <span class="badge" x-text="wrongBrush.counts.multiple"></span></button>
-                <button @click="wrongBrush.startPracticeByType('judge')" class="btn btn-outline" :disabled="wrongBrush.counts.judge === 0">判断题 <span class="badge" x-text="wrongBrush.counts.judge"></span></button>
-                <button @click="wrongBrush.startPracticeByType('all')" class="btn btn-neutral" :disabled="wrongBrush.counts.total === 0">全部错题</button>
-            </div>
-        </div>
+		<header class="header">
+			<h1>马原刷题工具</h1>
+			<p>一个清爽、高效的马克思主义基本原理刷题应用</p>
+		</header>
 
-        <div x-show="wrongBrush.isPracticeStarted && !wrongBrush.isEmpty">
-            <div x-show="wrongBrush.currentQuestion" class="section-header" x-text="wrongBrush.sectionTitle" x-transition.opacity.duration.300ms></div>
-            <div x-show="wrongBrush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
-                <div class="question-card-body">
-                    <div class="question-header">
-                        <h2 class="question-title">错题练习</h2>
-                        <div class="question-stats">
-                            <span>进度: <span x-text="wrongBrush.currentQuestionIndex + 1"></span> / <span x-text="wrongBrush.stats.total"></span></span> |
-                            <span class="text-green-highlight">正确: <span x-text="wrongBrush.stats.correct"></span></span> |
-                            <span class="text-red-highlight">错误: <span x-text="wrongBrush.stats.incorrect"></span></span>
-                        </div>
-                    </div>
-                    <div class="question-content-wrapper">
-                        <p class="question-text" x-text="wrongBrush.displayQuestionText"></p>
-                        <div class="options-container">
-                            <template x-if="wrongBrush.currentQuestion.type === 'single' || wrongBrush.currentQuestion.type === 'judge'">
-                                <template x-for="option in wrongBrush.currentQuestion.options" :key="option">
-                                    <label @click.prevent="wrongBrush.selectAndCheck(option.charAt(0))" class="option-label" :class="wrongBrush.getOptionClass(option)"><span x-text="option"></span></label>
-                                </template>
-                            </template>
-                            <template x-if="wrongBrush.currentQuestion.type === 'multiple'">
-                                <template x-for="option in wrongBrush.currentQuestion.options" :key="option">
-                                    <label class="option-label" :class="wrongBrush.getOptionClass(option)">
-                                        <input type="checkbox" :value="option.charAt(0)" x-model="wrongBrush.userSelection" class="checkbox" :disabled="wrongBrush.isAnswerChecked">
-                                        <span x-text="option"></span>
-                                    </label>
-                                </template>
-                            </template>
-                        </div>
-                    </div>
-                    <div x-show="wrongBrush.isAnswerChecked" class="answer-feedback" :class="{ 'correct': wrongBrush.isCorrect, 'incorrect': !wrongBrush.isCorrect }" x-transition>
-                        <span>正确答案: <span x-text="wrongBrush.currentQuestion.correctAnswer"></span></span>
-                        <div x-show="!wrongBrush.isCorrect" class="text-sm font-normal mt-1">这道题已在你的错题本中。连续答对3次后将自动移除。</div>
-                    </div>
-                    <div class="actions-footer">
-                        <button @click="wrongBrush.reset()" class="btn btn-ghost">返回</button>
-                        <div class="btn-group">
-                            <button @click="wrongBrush.prevQuestion()" class="btn" :disabled="wrongBrush.currentQuestionIndex <= 0">← 上一题</button>
-                            <button @click="wrongBrush.checkAnswer()" x-show="wrongBrush.currentQuestion.type === 'multiple' && !wrongBrush.isAnswerChecked" class="btn btn-primary">提交</button>
-                            <button @click="wrongBrush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+		<div class="mode-switcher card">
+			<div class="flex-container">
+				<button @click="setMode('view')" class="btn" :class="mode === 'view' ? 'btn-primary' : 'btn-ghost'">📚
+					查看题库</button>
+				<button @click="setMode('brush')" class="btn" :class="mode === 'brush' ? 'btn-primary' : 'btn-ghost'">✍️
+					随机刷题</button>
+				<button @click="setMode('wrong')" class="btn" :class="mode === 'wrong' ? 'btn-primary' : 'btn-ghost'">🔥
+					错题练习 <span class="badge" x-text="wrongQuestionCount"></span></button>
+			</div>
+		</div>
 
-            <div x-show="!wrongBrush.currentQuestion && wrongBrush.isPracticeStarted" class="card completion-card" x-transition.opacity.duration.300ms>
-                <h2>🎉 本轮练习完成! 🎉</h2>
-                <p>靡不有初，鲜克有终。坚持就是胜利！</p>
-                <div class="stats-grid">
-                    <div class="stat-item"><div class="stat-title">总题数</div><div class="stat-value" x-text="wrongBrush.stats.total"></div></div>
-                    <div class="stat-item"><div class="stat-title">正确</div><div class="stat-value text-green-highlight" x-text="wrongBrush.stats.correct"></div></div>
-                    <div class="stat-item"><div class="stat-title">错误</div><div class="stat-value text-red-highlight" x-text="wrongBrush.stats.incorrect"></div></div>
-                </div>
-                <button @click="wrongBrush.reset()" class="btn btn-primary">再来一轮</button>
-            </div>
-        </div>
+		<!-- 查看题库 -->
+		<div x-show="mode === 'view'">
+			<template x-for="chapter in chapters" :key="chapter.name">
+				<div class="collapse-wrapper">
+					<input type="checkbox" :id="chapter.name" class="collapse-checkbox">
+					<label :for="chapter.name" class="collapse-title" x-text="chapter.name"></label>
+					<div class="collapse-content">
+						<template x-for="(q, index) in chapter.list" :key="index">
+							<div class="question-item">
+								<p class="font-semibold" x-text="q[0]"></p>
+								<div class="options-preview">
+									<template x-for="item in q.slice(1, -2)">
+										<p :class="isHighlight(item, q[q.length - 2]) ? 'text-green-highlight' : ''"
+											x-text="item"></p>
+									</template>
+								</div>
+								<p class="answer-preview" x-text="q[q.length - 2]"></p>
+							</div>
+						</template>
+					</div>
+				</div>
+			</template>
+		</div>
 
-        <div x-show="wrongBrush.isEmpty" class="card empty-state">
-            <div class="icon">👍</div>
-            <h3 class="title">错题库是空的!</h3>
-            <p class="subtitle">真棒！继续保持，或者去随机刷题挑战一下吧。</p>
-        </div>
-    </div>
+		<!-- 随机刷题 -->
+		<div x-show="mode === 'brush'">
+			<div x-show="!brush.isPracticeStarted" class="card empty-state">
+				<h3 class="title">开始新的挑战</h3>
+				<div class="type-selector">
+					<button @click="brush.startPracticeByType('single')" class="btn btn-outline">单选题</button>
+					<button @click="brush.startPracticeByType('multiple')" class="btn btn-outline">多选题</button>
+					<button @click="brush.startPracticeByType('judge')" class="btn btn-outline">判断题</button>
+					<button @click="brush.startPracticeByType('all')" class="btn btn-neutral">全部题型</button>
+				</div>
+			</div>
 
-    <!-- V V V 这里是本次修改的核心 V V V -->
-    <button x-show="showScrollTop && mode === 'view'" @click="scrollToTop" class="scroll-to-top btn" x-transition.opacity.duration.300ms>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-    </button>
-    <!-- A A A 这里是本次修改的核心 A A A -->
+			<div x-show="brush.isPracticeStarted">
+				<div x-show="brush.currentQuestion" class="section-header" x-text="brush.sectionTitle"
+					x-transition.opacity.duration.300ms></div>
+				<div x-show="brush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
+					<div class="question-card-body">
+						<div class="question-header">
+							<h2 class="question-title">随机练习</h2>
+							<div class="question-stats">
+								<span>进度: <span x-text="brush.currentQuestionIndex + 1"></span> / <span
+										x-text="brush.stats.total"></span></span> |
+								<span class="text-green-highlight">正确: <span x-text="brush.stats.correct"></span></span>
+								|
+								<span class="text-red-highlight">错误: <span x-text="brush.stats.incorrect"></span></span>
+							</div>
+						</div>
+						<div class="question-content-wrapper">
+							<p class="question-text" x-text="brush.displayQuestionText"></p>
+							<div class="options-container">
+								<template
+									x-if="brush.currentQuestion.type === 'single' || brush.currentQuestion.type === 'judge'">
+									<template x-for="option in brush.currentQuestion.options" :key="option">
+										<label @click.prevent="brush.selectAndCheck(option.charAt(0))"
+											class="option-label" :class="brush.getOptionClass(option)"><span
+												x-text="option"></span></label>
+									</template>
+								</template>
+								<template x-if="brush.currentQuestion.type === 'multiple'">
+									<template x-for="option in brush.currentQuestion.options" :key="option">
+										<label class="option-label" :class="brush.getOptionClass(option)">
+											<input type="checkbox" :value="option.charAt(0)"
+												x-model="brush.userSelection" class="checkbox"
+												:disabled="brush.isAnswerChecked">
+											<span x-text="option"></span>
+										</label>
+									</template>
+								</template>
+							</div>
+						</div>
+						<div x-show="brush.isAnswerChecked" class="answer-feedback"
+							:class="{ 'correct': brush.isCorrect, 'incorrect': !brush.isCorrect }" x-transition>
+							正确答案: <span x-text="brush.currentQuestion.correctAnswer"></span>
+						</div>
+						<div class="actions-footer">
+							<button @click="brush.reset()" class="btn btn-ghost">返回</button>
+							<div class="btn-group">
+								<button @click="brush.prevQuestion()" class="btn"
+									:disabled="brush.currentQuestionIndex <= 0">← 上一题</button>
+								<button @click="brush.checkAnswer()"
+									x-show="brush.currentQuestion.type === 'multiple' && !brush.isAnswerChecked"
+									class="btn btn-primary">提交</button>
+								<button @click="brush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div x-show="!brush.currentQuestion && brush.isPracticeStarted" class="card completion-card"
+					x-transition.opacity.duration.300ms>
+					<h2>🎉 练习完成! 🎉</h2>
+					<p>温故而知新，可以为师矣。</p>
+					<div class="stats-grid">
+						<div class="stat-item">
+							<div class="stat-title">总题数</div>
+							<div class="stat-value" x-text="brush.stats.total"></div>
+						</div>
+						<div class="stat-item">
+							<div class="stat-title">正确</div>
+							<div class="stat-value text-green-highlight" x-text="brush.stats.correct"></div>
+						</div>
+						<div class="stat-item">
+							<div class="stat-title">错误</div>
+							<div class="stat-value text-red-highlight" x-text="brush.stats.incorrect"></div>
+						</div>
+					</div>
+					<button @click="brush.reset()" class="btn btn-primary">再来一轮</button>
+				</div>
+			</div>
+		</div>
 
-</div>
+		<!-- 错题练习 -->
+		<div x-show="mode === 'wrong'">
+			<div x-show="!wrongBrush.isPracticeStarted && !wrongBrush.isEmpty" class="card empty-state">
+				<h3 class="title">温故知新，攻克难点</h3>
+				<div class="type-selector">
+					<button @click="wrongBrush.startPracticeByType('single')" class="btn btn-outline"
+						:disabled="wrongBrush.counts.single === 0">单选题 <span class="badge"
+							x-text="wrongBrush.counts.single"></span></button>
+					<button @click="wrongBrush.startPracticeByType('multiple')" class="btn btn-outline"
+						:disabled="wrongBrush.counts.multiple === 0">多选题 <span class="badge"
+							x-text="wrongBrush.counts.multiple"></span></button>
+					<button @click="wrongBrush.startPracticeByType('judge')" class="btn btn-outline"
+						:disabled="wrongBrush.counts.judge === 0">判断题 <span class="badge"
+							x-text="wrongBrush.counts.judge"></span></button>
+					<button @click="wrongBrush.startPracticeByType('all')" class="btn btn-neutral"
+						:disabled="wrongBrush.counts.total === 0">全部错题</button>
+				</div>
+			</div>
+
+			<div x-show="wrongBrush.isPracticeStarted && !wrongBrush.isEmpty">
+				<div x-show="wrongBrush.currentQuestion" class="section-header" x-text="wrongBrush.sectionTitle"
+					x-transition.opacity.duration.300ms></div>
+				<div x-show="wrongBrush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
+					<div class="question-card-body">
+						<div class="question-header">
+							<h2 class="question-title">错题练习</h2>
+							<div class="question-stats">
+								<span>进度: <span x-text="wrongBrush.currentQuestionIndex + 1"></span> / <span
+										x-text="wrongBrush.stats.total"></span></span> |
+								<span class="text-green-highlight">正确: <span
+										x-text="wrongBrush.stats.correct"></span></span> |
+								<span class="text-red-highlight">错误: <span
+										x-text="wrongBrush.stats.incorrect"></span></span>
+							</div>
+						</div>
+						<div class="question-content-wrapper">
+							<p class="question-text" x-text="wrongBrush.displayQuestionText"></p>
+							<div class="options-container">
+								<template
+									x-if="wrongBrush.currentQuestion.type === 'single' || wrongBrush.currentQuestion.type === 'judge'">
+									<template x-for="option in wrongBrush.currentQuestion.options" :key="option">
+										<label @click.prevent="wrongBrush.selectAndCheck(option.charAt(0))"
+											class="option-label" :class="wrongBrush.getOptionClass(option)"><span
+												x-text="option"></span></label>
+									</template>
+								</template>
+								<template x-if="wrongBrush.currentQuestion.type === 'multiple'">
+									<template x-for="option in wrongBrush.currentQuestion.options" :key="option">
+										<label class="option-label" :class="wrongBrush.getOptionClass(option)">
+											<input type="checkbox" :value="option.charAt(0)"
+												x-model="wrongBrush.userSelection" class="checkbox"
+												:disabled="wrongBrush.isAnswerChecked">
+											<span x-text="option"></span>
+										</label>
+									</template>
+								</template>
+							</div>
+						</div>
+						<div x-show="wrongBrush.isAnswerChecked" class="answer-feedback"
+							:class="{ 'correct': wrongBrush.isCorrect, 'incorrect': !wrongBrush.isCorrect }"
+							x-transition>
+							<span>正确答案: <span x-text="wrongBrush.currentQuestion.correctAnswer"></span></span>
+							<div x-show="!wrongBrush.isCorrect" class="text-sm font-normal mt-1">
+								这道题已在你的错题本中。连续答对3次后将自动移除。</div>
+						</div>
+						<div class="actions-footer">
+							<button @click="wrongBrush.reset()" class="btn btn-ghost">返回</button>
+							<div class="btn-group">
+								<button @click="wrongBrush.prevQuestion()" class="btn"
+									:disabled="wrongBrush.currentQuestionIndex <= 0">← 上一题</button>
+								<button @click="wrongBrush.checkAnswer()"
+									x-show="wrongBrush.currentQuestion.type === 'multiple' && !wrongBrush.isAnswerChecked"
+									class="btn btn-primary">提交</button>
+								<button @click="wrongBrush.nextQuestion()" class="btn btn-secondary">下一题 →</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div x-show="!wrongBrush.currentQuestion && wrongBrush.isPracticeStarted" class="card completion-card"
+					x-transition.opacity.duration.300ms>
+					<h2>🎉 本轮练习完成! 🎉</h2>
+					<p>靡不有初，鲜克有终。坚持就是胜利！</p>
+					<div class="stats-grid">
+						<div class="stat-item">
+							<div class="stat-title">总题数</div>
+							<div class="stat-value" x-text="wrongBrush.stats.total"></div>
+						</div>
+						<div class="stat-item">
+							<div class="stat-title">正确</div>
+							<div class="stat-value text-green-highlight" x-text="wrongBrush.stats.correct"></div>
+						</div>
+						<div class="stat-item">
+							<div class="stat-title">错误</div>
+							<div class="stat-value text-red-highlight" x-text="wrongBrush.stats.incorrect"></div>
+						</div>
+					</div>
+					<button @click="wrongBrush.reset()" class="btn btn-primary">再来一轮</button>
+				</div>
+			</div>
+
+			<div x-show="wrongBrush.isEmpty" class="card empty-state">
+				<div class="icon">👍</div>
+				<h3 class="title">错题库是空的!</h3>
+				<p class="subtitle">真棒！继续保持，或者去随机刷题挑战一下吧。</p>
+			</div>
+		</div>
+
+		<!-- V V V 这里是本次修改的核心 V V V -->
+		<button x-show="showScrollTop && mode === 'view'" @click="scrollToTop" class="scroll-to-top btn"
+			x-transition.opacity.duration.300ms>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M12 19V5M5 12l7-7 7 7" />
+			</svg>
+		</button>
+		<!-- A A A 这里是本次修改的核心 A A A -->
+
+	</div>
 </body>
-
