@@ -46,11 +46,20 @@ function parseQuestion(qArray) {
     let correctAnswer = answerLine.split(':')[1]?.trim();
     if (!correctAnswer) return null;
 
-    const isMulti = questionText.includes('(多选题)');
-    const isJudge = questionText.includes('(判断题)');
-    let type = 'single';
-    if (isMulti) type = 'multiple';
-    if (isJudge) type = 'judge';
+    // const isMulti = questionText.includes('(多选题)');
+    // const isJudge = questionText.includes('(判断题)');
+    // let type = 'single';
+    // if (isMulti) type = 'multiple';
+    // if (isJudge) type = 'judge';
+
+    let type;
+    if (questionText.includes('(判断题)')) {
+        type = 'judge';
+    } else if (questionText.includes('(多选题)')) {
+        type = 'multiple';
+    } else {
+        type = 'single';
+    }
 
     if (type === 'judge') {
         if (correctAnswer === '对') correctAnswer = 'A';
