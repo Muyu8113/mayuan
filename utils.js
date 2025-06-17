@@ -1,5 +1,6 @@
 // LocalStorage 的辅助函数
 const WRONG_SET_KEY = 'marxism_wrong_set';
+const PROGRESS_KEY_PREFIX = 'marxism_progress_'; // 为进度保存添加前缀
 
 function getWrongSet() {
     try {
@@ -65,11 +66,11 @@ function parseQuestion(qArray) {
         const firstOptionIndex = cleanArray.findIndex(line => /^[A-Z]\./.test(line.trim()));
 
         if (firstOptionIndex === -1 || firstOptionIndex >= answerIndex) {
-            return null;
+            return null; // Malformed question without valid options
         }
 
         const questionLines = cleanArray.slice(0, firstOptionIndex);
-        question = questionLines.join('\n');
+        question = questionLines.join('\n'); // Join with newline for multi-line display
         options = cleanArray.slice(firstOptionIndex, answerIndex);
     }
 
@@ -107,6 +108,41 @@ function createBrushLogic(isWrongSetMode = false) {
         counts: {single: 0, multiple: 0, judge: 0, total: 0},
         isEmpty: true,
         answerHistory: {},
+        practiceType: null,
+
+        hasSavedProgress(type) {
+            return localStorage.getItem(PROGRESS_KEY_PREFIX + type) !== null;
+        },
+
+        saveProgress() {
+            if (!this.isPracticeStarted || !this.practiceType || this.currentQuestion === null) return;
+            const state = {
+                practicePool: this.practicePool,
+                currentQuestionIndex: this.currentQuestionIndex,
+                stats: this.stats,
+                answerHistory: this.answerHistory,
+            };
+            localStorage.setItem(PROGRESS_KEY_PREFIX + this.practiceType, JSON.stringify(state));
+        },
+
+        clearProgress(type = null) {
+            const progressType = type || this.practiceType;
+            if (progressType) {
+                localStorage.removeItem(PROGRESS_KEY_PREFIX + progressType);
+            }
+        },
+
+        continuePractice(type) {
+            const savedState = JSON.parse(localStorage.getItem(PROGRESS_KEY_PREFIX + type));
+            if (!savedState) return;
+
+            this.practicePool = savedState.practicePool;
+            this.stats = savedState.stats;
+            this.answerHistory = savedState.answerHistory;
+            this.isPracticeStarted = true;
+            this.practiceType = type;
+            this.loadQuestion(savedState.currentQuestionIndex);
+        },
 
         get displayQuestionText() {
             if (!this.currentQuestion) return '';
@@ -135,15 +171,19 @@ function createBrushLogic(isWrongSetMode = false) {
             }
         },
 
+        // V V V START OF CHANGES V V V
         reset() {
             if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
+            // 不再在此处清除进度，而是将状态重置到初始界面
             this.isPracticeStarted = false;
             this.currentQuestion = null;
             this.answerHistory = {};
+            this.practiceType = null;
             if (isWrongSetMode) {
                 this.checkWrongSetCounts();
             }
         },
+        // A A A END OF CHANGES A A A
 
         checkWrongSetCounts() {
             if (!isWrongSetMode) return;
@@ -157,7 +197,8 @@ function createBrushLogic(isWrongSetMode = false) {
         },
 
         startPracticeByType(type) {
-            if (isWrongSetMode) this.checkWrongSetCounts();
+            this.clearProgress(type); // 只有在明确开始新练习时才清除旧进度
+            this.practiceType = type;
             let source = this.allQuestions;
             if (type === 'all') {
                 const singles = source.filter(q => q.type === 'single');
@@ -185,6 +226,7 @@ function createBrushLogic(isWrongSetMode = false) {
             this.currentQuestionIndex = index;
             if (index < 0 || index >= this.practicePool.length) {
                 this.currentQuestion = null;
+                this.clearProgress(); // 完成练习时清除进度
                 return;
             }
             this.currentQuestion = this.practicePool[index];
@@ -198,6 +240,7 @@ function createBrushLogic(isWrongSetMode = false) {
                 this.isCorrect = false;
                 this.userSelection = this.currentQuestion.type === 'multiple' ? [] : '';
             }
+            this.saveProgress();
         },
 
         prevQuestion() {
@@ -209,6 +252,7 @@ function createBrushLogic(isWrongSetMode = false) {
         nextQuestion() {
             if (this.currentQuestionIndex >= this.practicePool.length - 1) {
                 this.currentQuestion = null;
+                this.clearProgress(); // 完成练习时清除进度
             } else {
                 this.loadQuestion(this.currentQuestionIndex + 1);
             }
@@ -266,6 +310,8 @@ function createBrushLogic(isWrongSetMode = false) {
                 isCorrect: this.isCorrect
             };
 
+            this.saveProgress();
+
             if (isAutoCheck && this.currentQuestion.type !== 'multiple') {
                 this.autoNextTimeout = setTimeout(() => this.nextQuestion(), 1200);
             }
@@ -299,6 +345,8 @@ document.addEventListener('alpine:init', () => {
         isDark: false,
         showScrollTop: false,
         showToc: false,
+        showContinuePrompt: false,
+        pendingPracticeType: null,
 
         init() {
             this.allParsedQuestions = window.answer.flatMap(ch => ch.list)
@@ -326,6 +374,33 @@ document.addEventListener('alpine:init', () => {
             this.$watch('showToc', value => {
                 document.body.classList.toggle('overflow-hidden', value);
             });
+        },
+
+        attemptToStartPractice(brushInstance, type) {
+            if (brushInstance.hasSavedProgress(type)) {
+                this.pendingPracticeType = type;
+                this.showContinuePrompt = true;
+            } else {
+                brushInstance.startPracticeByType(type);
+            }
+        },
+
+        handleContinue() {
+            if (this.pendingPracticeType) {
+                const brushInstance = this.mode === 'brush' ? this.brush : this.wrongBrush;
+                brushInstance.continuePractice(this.pendingPracticeType);
+            }
+            this.showContinuePrompt = false;
+            this.pendingPracticeType = null;
+        },
+
+        handleRestart() {
+            if (this.pendingPracticeType) {
+                const brushInstance = this.mode === 'brush' ? this.brush : this.wrongBrush;
+                brushInstance.startPracticeByType(this.pendingPracticeType);
+            }
+            this.showContinuePrompt = false;
+            this.pendingPracticeType = null;
         },
 
         handleScroll() {

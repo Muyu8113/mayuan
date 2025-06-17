@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="新增左上角目录">
+    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="fix：修复在刷题练习中某些题目内容丢失问题">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils.js" afterDir="false" />
     </list>
@@ -79,7 +80,7 @@
       <workItem from="1750063349174" duration="1590000" />
       <workItem from="1750072220455" duration="8880000" />
       <workItem from="1750138014807" duration="6844000" />
-      <workItem from="1750160781029" duration="1202000" />
+      <workItem from="1750160781029" duration="2491000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -153,7 +154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750150059800</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="fix：修复在刷题练习中某些题目内容丢失问题">
+      <option name="closed" value="true" />
+      <created>1750162118834</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1750162118834</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +176,7 @@
     <MESSAGE value="fix: loadMark 定位问题" />
     <MESSAGE value="fix: 单选题题型中，出现别的题型问题" />
     <MESSAGE value="新增左上角目录" />
-    <option name="LAST_COMMIT_MESSAGE" value="新增左上角目录" />
+    <MESSAGE value="fix：修复在刷题练习中某些题目内容丢失问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix：修复在刷题练习中某些题目内容丢失问题" />
   </component>
 </project>
