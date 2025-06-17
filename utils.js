@@ -291,6 +291,8 @@ document.addEventListener('alpine:init', () => {
         isDark: false,
         showScrollTop: false,
 
+        showToc: false,
+
         init() {
             this.allParsedQuestions = window.answer.flatMap(ch => ch.list)
                 .map(q => parseQuestion(q))
@@ -313,6 +315,10 @@ document.addEventListener('alpine:init', () => {
             document.documentElement.setAttribute('data-theme', savedTheme);
 
             window.addEventListener('scroll', () => this.handleScroll());
+
+            this.$watch('showToc', value => {
+                document.body.classList.toggle('overflow-hidden', value);
+            });
         },
 
         handleScroll() {
@@ -324,6 +330,15 @@ document.addEventListener('alpine:init', () => {
                 top: 0,
                 behavior: 'smooth'
             });
+        },
+
+        scrollToChapter(index) {
+            const targetId = 'toc-target-' + index;
+            const element = document.getElementById(targetId);
+            if (element) {
+                element.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
+            this.showToc = false;
         },
 
         toggleTheme() {
