@@ -37,39 +37,47 @@ function parseQuestion(qArray) {
     const cleanArray = qArray.filter(item => typeof item === 'string' && item.trim() !== '');
     if (cleanArray.length < 2) return null;
 
-    const questionText = cleanArray[0];
     const answerLine = cleanArray.find(line => line.startsWith('正确答案:'));
-    if (!questionText || !answerLine) return null;
-
+    if (!answerLine) return null;
     const answerIndex = cleanArray.indexOf(answerLine);
-    let options = cleanArray.slice(1, answerIndex);
     let correctAnswer = answerLine.split(':')[1]?.trim();
     if (!correctAnswer) return null;
 
+    const mainQuestionLine = cleanArray[0];
     let type;
-    if (questionText.includes('(判断题)')) {
+    if (/[（(]判断题[)）]/.test(mainQuestionLine)) {
         type = 'judge';
-    } else if (questionText.includes('(多选题)')) {
+    } else if (/[（(]多选题[)）]/.test(mainQuestionLine)) {
         type = 'multiple';
     } else {
         type = 'single';
     }
 
+    let question;
+    let options;
+
     if (type === 'judge') {
+        question = mainQuestionLine;
+        options = ['A. 对', 'B. 错'];
         if (correctAnswer === '对') correctAnswer = 'A';
         if (correctAnswer === '错') correctAnswer = 'B';
+    } else {
+        const firstOptionIndex = cleanArray.findIndex(line => /^[A-Z]\./.test(line.trim()));
+
+        if (firstOptionIndex === -1 || firstOptionIndex >= answerIndex) {
+            return null;
+        }
+
+        const questionLines = cleanArray.slice(0, firstOptionIndex);
+        question = questionLines.join('\n');
+        options = cleanArray.slice(firstOptionIndex, answerIndex);
     }
 
-    if (type === 'judge' && options.length === 0) {
-        options.push('A. 对', 'B. 错');
-    }
-
-    const finalOptions = options.filter(opt => /^[A-Z]\./.test(opt.trim()));
-    if (finalOptions.length === 0 && type !== 'judge') return null;
+    if (options.length === 0) return null;
 
     return {
-        question: questionText,
-        options: finalOptions.length > 0 ? finalOptions : options,
+        question: question,
+        options: options,
         type: type,
         correctAnswer: correctAnswer,
         originalData: qArray
@@ -264,7 +272,7 @@ function createBrushLogic(isWrongSetMode = false) {
         },
 
         getOptionClass(option) {
-            if (!this.isAnswerChecked) return '';
+            if (!this.currentQuestion || !this.isAnswerChecked) return '';
             const optionChar = option.charAt(0);
             const isCorrectAnswer = this.currentQuestion.correctAnswer.includes(optionChar);
             let isSelected = false;
@@ -290,7 +298,6 @@ document.addEventListener('alpine:init', () => {
         wrongBrush: {},
         isDark: false,
         showScrollTop: false,
-
         showToc: false,
 
         init() {
@@ -336,7 +343,14 @@ document.addEventListener('alpine:init', () => {
             const targetId = 'toc-target-' + index;
             const element = document.getElementById(targetId);
             if (element) {
-                element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                const headerOffset = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
             }
             this.showToc = false;
         },
@@ -358,6 +372,7 @@ document.addEventListener('alpine:init', () => {
             } else if (newMode === 'wrong') {
                 this.wrongBrush.reset();
             }
+            this.showToc = false;
         },
 
         isHighlight(option, ans) {

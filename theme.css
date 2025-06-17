@@ -316,6 +316,7 @@ html[data-theme='dark'] .btn.btn-neutral {
     font-weight: 500;
     margin-bottom: 1.5rem;
     line-height: 1.7;
+    white-space: pre-line; /* V V V THIS IS THE NEWLY ADDED STYLE V V V */
 }
 
 .options-container {
@@ -583,7 +584,7 @@ html[data-theme='dark'] .btn.btn-neutral {
     position: fixed;
     top: 0;
     left: 0;
-    bottom: 0; /* Use top/bottom to fill height reliably on mobile */
+    bottom: 0;
     width: 300px;
     max-width: 80vw;
     background-color: var(--theme-bg-secondary);
@@ -593,7 +594,7 @@ html[data-theme='dark'] .btn.btn-neutral {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* Include padding in height calculation */
+    box-sizing: border-box;
 }
 
 .toc-title {
