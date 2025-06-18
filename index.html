@@ -133,7 +133,7 @@
 		display: inline-block;
 		font-family: monospace;
 		border-right: 2px solid transparent; /* 光标 */
-		font-size: 3rem;
+		font-size: 2.5rem;
 	">马原刷题工具</h1>
         </div>
         <div style="display: flex; justify-content: center; align-items: center; overflow: hidden;">
@@ -274,10 +274,26 @@
         <div x-show="brush.isPracticeStarted">
             <div x-show="brush.currentQuestion" class="section-header" x-text="brush.sectionTitle"
                  x-transition.opacity.duration.300ms></div>
-            <div x-show="brush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
+            <!-- V V V START OF CHANGES V V V -->
+            <div x-show="brush.currentQuestion" class="card" :key="brush.currentQuestionIndex"
+                 x-transition.opacity.duration.300ms>
+                <!-- A A A END OF CHANGES A A A -->
                 <div class="question-card-body">
                     <div class="question-header">
                         <h2 class="question-title">随机练习</h2>
+                        <div class="question-header-center">
+                            <button @click="showQuestionList = !showQuestionList"
+                                    class="btn btn-ghost q-list-toggle-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </button>
+                        </div>
                         <div class="question-stats">
 								<span>进度: <span x-text="brush.currentQuestionIndex + 1"></span> / <span
                                         x-text="brush.stats.total"></span></span> |
@@ -379,10 +395,26 @@
         <div x-show="wrongBrush.isPracticeStarted && !wrongBrush.isEmpty">
             <div x-show="wrongBrush.currentQuestion" class="section-header" x-text="wrongBrush.sectionTitle"
                  x-transition.opacity.duration.300ms></div>
-            <div x-show="wrongBrush.currentQuestion" class="card" x-transition.opacity.duration.300ms>
+            <!-- V V V START OF CHANGES V V V -->
+            <div x-show="wrongBrush.currentQuestion" class="card" :key="wrongBrush.currentQuestionIndex"
+                 x-transition.opacity.duration.300ms>
+                <!-- A A A END OF CHANGES A A A -->
                 <div class="question-card-body">
                     <div class="question-header">
                         <h2 class="question-title">错题练习</h2>
+                        <div class="question-header-center">
+                            <button @click="showQuestionList = !showQuestionList"
+                                    class="btn btn-ghost q-list-toggle-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </button>
+                        </div>
                         <div class="question-stats">
 								<span>进度: <span x-text="wrongBrush.currentQuestionIndex + 1"></span> / <span
                                         x-text="wrongBrush.stats.total"></span></span> |
@@ -471,7 +503,6 @@
         </div>
     </div>
 
-    <!-- V V V START OF CHANGES V V V -->
     <!-- Continue Practice Prompt -->
     <div x-show="showContinuePrompt" class="card empty-state" x-transition.opacity>
         <h3 class="title">发现未完成的练习</h3>
@@ -481,7 +512,6 @@
             <button @click="handleRestart()" class="btn btn-outline">重新开始</button>
         </div>
     </div>
-    <!-- A A A END OF CHANGES A A A -->
 
     <button x-show="showScrollTop && mode === 'view'" @click="scrollToTop" class="scroll-to-top btn"
             x-transition.opacity.duration.300ms>
@@ -503,6 +533,41 @@
         <div class="toc-list">
             <template x-for="(chapter, index) in chapters" :key="index">
                 <div @click="scrollToChapter(index)" class="toc-item" x-text="chapter.name"></div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Question List Panel -->
+    <div x-show="showQuestionList" @click="showQuestionList = false" class="q-list-overlay" x-transition.opacity></div>
+    <div x-show="showQuestionList" class="q-list-panel"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="translate-y-full"
+         x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="translate-y-0"
+         x-transition:leave-end="translate-y-full">
+        <div class="q-list-header">
+            <h2 class="q-list-title">题目列表</h2>
+            <button @click="showQuestionList = false" class="btn btn-ghost" style="padding: 0.2rem;">关闭</button>
+        </div>
+        <div class="q-list-grid">
+            <template x-if="mode === 'brush' && brush.practicePool.length > 0">
+                <template x-for="(_, index) in brush.practicePool" :key="index">
+                    <button class="q-list-item"
+                            :class="getQuestionStatusClass(brush, index)"
+                            @click="jumpToQuestion(brush, index)">
+                        <span x-text="index + 1"></span>
+                    </button>
+                </template>
+            </template>
+            <template x-if="mode === 'wrong' && wrongBrush.practicePool.length > 0">
+                <template x-for="(_, index) in wrongBrush.practicePool" :key="index">
+                    <button class="q-list-item"
+                            :class="getQuestionStatusClass(wrongBrush, index)"
+                            @click="jumpToQuestion(wrongBrush, index)">
+                        <span x-text="index + 1"></span>
+                    </button>
+                </template>
             </template>
         </div>
     </div>

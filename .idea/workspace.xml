@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="fix：修复在刷题练习中某些题目内容丢失问题">
+    <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="新增：添加了记录刷题进度，保留上一次刷题的进度，可以自由选择继续练习 或 重新开始练习">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils.js" afterDir="false" />
@@ -30,6 +31,9 @@
     &quot;accountId&quot;: &quot;ca32196c-27fd-435a-92c5-79e128f59663&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -42,21 +46,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/Administrator/Desktop/Web/mayuan",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Administrator/Desktop/Web/mayuan&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Administrator\Desktop\Web\mayuan\image" />
@@ -80,7 +84,9 @@
       <workItem from="1750063349174" duration="1590000" />
       <workItem from="1750072220455" duration="8880000" />
       <workItem from="1750138014807" duration="6844000" />
-      <workItem from="1750160781029" duration="2491000" />
+      <workItem from="1750160781029" duration="2858000" />
+      <workItem from="1750170300453" duration="31000" />
+      <workItem from="1750204949853" duration="4892000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -162,7 +168,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750162118834</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="新增：添加了记录刷题进度，保留上一次刷题的进度，可以自由选择继续练习 或 重新开始练习">
+      <option name="closed" value="true" />
+      <created>1750163635903</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1750163635903</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,6 +191,7 @@
     <MESSAGE value="fix: 单选题题型中，出现别的题型问题" />
     <MESSAGE value="新增左上角目录" />
     <MESSAGE value="fix：修复在刷题练习中某些题目内容丢失问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix：修复在刷题练习中某些题目内容丢失问题" />
+    <MESSAGE value="新增：添加了记录刷题进度，保留上一次刷题的进度，可以自由选择继续练习 或 重新开始练习" />
+    <option name="LAST_COMMIT_MESSAGE" value="新增：添加了记录刷题进度，保留上一次刷题的进度，可以自由选择继续练习 或 重新开始练习" />
   </component>
 </project>
