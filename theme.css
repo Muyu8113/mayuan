@@ -1,3 +1,5 @@
+/* --- START OF FILE theme.css --- */
+
 /* --- 1. 全局与主题变量 --- */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
 
@@ -284,7 +286,6 @@ html[data-theme='dark'] .btn.btn-neutral {
     padding: 1rem;
 }
 
-/* V V V START OF CHANGES V V V */
 .question-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -322,9 +323,6 @@ html[data-theme='dark'] .btn.btn-neutral {
     white-space: nowrap;
     justify-self: end;
 }
-
-/* A A A END OF CHANGES A A A */
-
 
 .question-content-wrapper {
     background-color: var(--theme-bg-accent);
@@ -422,13 +420,10 @@ html[data-theme='dark'] .btn.btn-neutral {
     gap: 0.5rem;
 }
 
-/* V V V START OF CHANGES V V V */
 .actions-footer .btn-group-left {
     display: flex;
     gap: 0.5rem;
 }
-
-/* A A A END OF CHANGES A A A */
 
 .actions-footer .btn-group {
     display: flex;
@@ -764,3 +759,51 @@ html[data-theme='dark'] .btn.btn-neutral {
 .q-list-item:hover:not(.current) {
     border-color: var(--theme-primary);
 }
+
+/* --- 10. 新增：模拟测试历史记录表格 --- */
+.history-table-wrapper {
+    margin-top: 1.5rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.history-table thead {
+    position: sticky;
+    top: 0;
+    background-color: var(--theme-bg-accent);
+    z-index: 1;
+}
+
+.history-table th, .history-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.history-table th {
+    font-weight: 500;
+    color: var(--theme-text-secondary);
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table tbody tr:hover {
+    background-color: var(--theme-bg-accent);
+}
+
+/* --- 新增：测试模式中选项的选中状态 --- */
+.option-label.option-label-selected {
+    border-color: var(--theme-primary);
+    background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+}
+

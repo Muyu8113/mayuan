@@ -1,6 +1,9 @@
+// --- START OF FILE utils.js ---
+
 // LocalStorage 的辅助函数
 const WRONG_SET_KEY = 'marxism_wrong_set';
 const PROGRESS_KEY_PREFIX = 'marxism_progress_'; // 为进度保存添加前缀
+const TEST_HISTORY_KEY = 'marxism_test_history'; // 新增：为测试历史记录添加键
 
 function getWrongSet() {
     try {
@@ -344,6 +347,274 @@ function createBrushLogic(isWrongSetMode = false) {
     }
 }
 
+// --- 模拟测试逻辑 (已更新) ---
+function createTestLogic() {
+    return {
+        allQuestions: [],
+        practicePool: [],
+        currentQuestionIndex: -1,
+        currentQuestion: null,
+        userSelection: null,
+        isPracticeStarted: false,
+        isAnswerChecked: false,
+        isCorrect: false,
+        stats: {correct: 0, incorrect: 0, total: 100}, // total is fixed at 100
+        answerHistory: {},
+        history: [],
+        timerInterval: null,
+        startTime: 0,
+        elapsedTime: 0,
+        formattedTime: '00:00',
+        lastTestResult: null,
+        autoNextTimeout: null,
+
+        init(allParsedQuestions) {
+            this.allQuestions = allParsedQuestions;
+            this.loadHistory();
+        },
+
+        loadHistory() {
+            const data = localStorage.getItem(TEST_HISTORY_KEY);
+            this.history = data ? JSON.parse(data) : [];
+        },
+
+        saveHistory() {
+            localStorage.setItem(TEST_HISTORY_KEY, JSON.stringify(this.history));
+        },
+
+        startTimer() {
+            this.startTime = Date.now() - this.elapsedTime;
+            this.timerInterval = setInterval(() => {
+                this.elapsedTime = Date.now() - this.startTime;
+                this.formattedTime = this.formatDuration(this.elapsedTime / 1000);
+            }, 1000);
+        },
+
+        stopTimer() {
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+        },
+
+        formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            const pad = (num) => num.toString().padStart(2, '0');
+            if (h > 0) return `${pad(h)}:${pad(m)}:${pad(s)}`;
+            return `${pad(m)}:${pad(s)}`;
+        },
+
+        reset() {
+            this.stopTimer();
+            if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
+            this.isPracticeStarted = false;
+            this.currentQuestion = null;
+            this.answerHistory = {};
+            this.lastTestResult = null;
+            this.loadHistory();
+        },
+
+        startTest() {
+            const counts = {single: 50, multiple: 30, judge: 20};
+            this.stats.total = counts.single + counts.multiple + counts.judge;
+            const singles = shuffleArray(this.allQuestions.filter(q => q.type === 'single')).slice(0, counts.single);
+            const multiples = shuffleArray(this.allQuestions.filter(q => q.type === 'multiple')).slice(0, counts.multiple);
+            const judges = shuffleArray(this.allQuestions.filter(q => q.type === 'judge')).slice(0, counts.judge);
+
+            this.practicePool = [...singles, ...multiples, ...judges];
+            // Ensure total matches the actual pool size if source is insufficient
+            this.stats.total = this.practicePool.length;
+
+            if (this.stats.total === 0) {
+                alert("题库为空，无法开始测试！");
+                return;
+            }
+
+            this.isPracticeStarted = true;
+            this.currentQuestionIndex = -1;
+            this.stats.correct = 0;
+            this.stats.incorrect = 0;
+            this.answerHistory = {};
+            this.elapsedTime = 0;
+            this.formattedTime = '00:00';
+            this.startTimer();
+            this.loadQuestion(0);
+        },
+
+        finishTest() {
+            this.stopTimer();
+            this.currentQuestion = null;
+
+            // --- 这是本次修改的核心 ---
+            const answeredCount = Object.keys(this.answerHistory).length;
+            const accuracy = answeredCount > 0
+                ? ((this.stats.correct / answeredCount) * 100).toFixed(2) + '%'
+                : '0.00%';
+
+            const result = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                stats: {...this.stats},
+                answeredCount: answeredCount, // 新增：记录实际答题数
+                duration: this.elapsedTime,
+                formattedDuration: this.formatDuration(this.elapsedTime / 1000),
+                accuracy: accuracy
+            };
+            // --- 修改结束 ---
+
+            this.lastTestResult = result;
+            this.history.unshift(result);
+            this.saveHistory();
+        },
+
+        isLastQuestion() {
+            return this.currentQuestionIndex === this.practicePool.length - 1;
+        },
+
+        get nextButtonText() {
+            return this.isLastQuestion() ? '完成交卷' : '下一题 →';
+        },
+
+        get displayQuestionText() {
+            if (!this.currentQuestion) return '';
+            const questionWithoutOldNumber = this.currentQuestion.question.replace(/^\d+\.\s*/, '');
+            return `${this.currentQuestionIndex + 1}. ${questionWithoutOldNumber}`;
+        },
+
+        get sectionTitle() {
+            if (!this.currentQuestion) return '';
+            switch (this.currentQuestion.type) {
+                case 'single':
+                    return '--- 单选题 ---';
+                case 'multiple':
+                    return '--- 多选题 ---';
+                case 'judge':
+                    return '--- 判断题 ---';
+                default:
+                    return '';
+            }
+        },
+
+        loadQuestion(index) {
+            if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
+            this.isAnswerChecked = false;
+            this.isCorrect = false;
+
+            this.currentQuestionIndex = index;
+            if (index < 0 || index >= this.practicePool.length) {
+                this.finishTest();
+                return;
+            }
+
+            this.currentQuestion = this.practicePool[index];
+            this.userSelection = this.currentQuestion.type === 'multiple' ? [] : '';
+
+            const history = this.answerHistory[index];
+            if (history) {
+                this.isAnswerChecked = true;
+                this.isCorrect = history.isCorrect;
+                this.userSelection = history.userSelection;
+            }
+        },
+
+        prevQuestion() {
+            if (this.currentQuestionIndex > 0) {
+                this.loadQuestion(this.currentQuestionIndex - 1);
+            }
+        },
+
+        moveToNextQuestion() {
+            if (this.isLastQuestion()) {
+                this.finishTest();
+            } else {
+                this.loadQuestion(this.currentQuestionIndex + 1);
+            }
+        },
+
+        selectOption(selection) {
+            if (this.isAnswerChecked) return;
+            if (this.currentQuestion.type === 'multiple') {
+                const index = this.userSelection.indexOf(selection);
+                if (index > -1) {
+                    this.userSelection.splice(index, 1);
+                } else {
+                    this.userSelection.push(selection);
+                }
+            } else {
+                this.userSelection = selection;
+            }
+        },
+
+        checkAnswerImmediately() {
+            if (!this.currentQuestion || this.isAnswerChecked) return;
+
+            if (this.currentQuestion.type === 'multiple' && this.userSelection.length === 0) {
+                alert('请选择答案。');
+                return;
+            }
+            if (this.currentQuestion.type !== 'multiple' && !this.userSelection) {
+                alert('请选择答案。');
+                return;
+            }
+
+            this.isAnswerChecked = true;
+            let isCorrect;
+            if (this.currentQuestion.type === 'multiple') {
+                const userAnswerSorted = this.userSelection.sort().join('');
+                const correctAnswerSorted = [...this.currentQuestion.correctAnswer].sort().join('');
+                isCorrect = userAnswerSorted === correctAnswerSorted;
+            } else {
+                isCorrect = this.userSelection === this.currentQuestion.correctAnswer;
+            }
+
+            this.isCorrect = isCorrect;
+
+            if (!this.answerHistory[this.currentQuestionIndex]) {
+                if (isCorrect) {
+                    this.stats.correct++;
+                } else {
+                    this.stats.incorrect++;
+                    addQuestionToWrongSet(this.currentQuestion.originalData);
+                }
+                this.answerHistory[this.currentQuestionIndex] = {
+                    userSelection: this.userSelection,
+                    isCorrect: this.isCorrect
+                };
+            }
+
+            if (this.isCorrect) {
+                this.autoNextTimeout = setTimeout(() => {
+                    this.moveToNextQuestion();
+                }, 1200);
+            }
+        },
+
+        getOptionClass(option) {
+            if (!this.currentQuestion) return '';
+            const optionChar = option.charAt(0);
+            let isSelected = false;
+
+            if (this.currentQuestion.type === 'multiple') {
+                isSelected = this.userSelection.includes(optionChar);
+            } else {
+                isSelected = this.userSelection === optionChar;
+            }
+
+            if (this.isAnswerChecked) {
+                const isCorrectAnswer = this.currentQuestion.correctAnswer.includes(optionChar);
+                if (isCorrectAnswer) return 'option-label-correct';
+                if (isSelected && !isCorrectAnswer) return 'option-label-incorrect';
+                return '';
+            } else {
+                return isSelected ? 'option-label-selected' : '';
+            }
+        },
+    }
+}
+
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('app', () => ({
         mode: 'view',
@@ -352,6 +623,7 @@ document.addEventListener('alpine:init', () => {
         wrongQuestionCount: 0,
         brush: {},
         wrongBrush: {},
+        testBrush: {},
         isDark: false,
         showScrollTop: false,
         showToc: false,
@@ -366,9 +638,11 @@ document.addEventListener('alpine:init', () => {
 
             this.brush = createBrushLogic(false);
             this.wrongBrush = createBrushLogic(true);
+            this.testBrush = createTestLogic();
 
             this.brush.init(this.allParsedQuestions);
             this.wrongBrush.init();
+            this.testBrush.init(this.allParsedQuestions);
 
             this.updateWrongCount();
             document.addEventListener('wrongset-updated', () => {
@@ -407,6 +681,11 @@ document.addEventListener('alpine:init', () => {
         },
 
         attemptToStartPractice(brushInstance, type) {
+            if (this.mode === 'test') {
+                brushInstance.startTest();
+                return;
+            }
+
             if (brushInstance.hasSavedProgress(type)) {
                 this.pendingPracticeType = type;
                 this.showContinuePrompt = true;
@@ -476,6 +755,8 @@ document.addEventListener('alpine:init', () => {
                 this.brush.reset();
             } else if (newMode === 'wrong') {
                 this.wrongBrush.reset();
+            } else if (newMode === 'test') {
+                this.testBrush.reset();
             }
             this.showToc = false;
             this.showQuestionList = false;
@@ -491,4 +772,3 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 });
-
