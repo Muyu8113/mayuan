@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8020ee85-f987-4a74-aeae-641e6a16a30f" name="更改" comment="2024年6月20日 &#10;Bug Fixes：修复练习进度混淆的 Bug">
+      <change afterPath="$PROJECT_DIR$/analysis.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
@@ -48,29 +49,32 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JavaScript 调试.index.html.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/Administrator/Desktop/mayuan",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Administrator/Desktop/Web/mayuan",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Desktop\Web\mayuan" />
       <recent name="C:\Users\Administrator\Desktop\Web\mayuan\image" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-WS-251.25410.117" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
       </set>
     </attachedChunks>
   </component>
@@ -91,7 +95,17 @@
       <workItem from="1750397211134" duration="2063000" />
       <workItem from="1750399906357" duration="601000" />
       <workItem from="1750406325646" duration="32000" />
-      <workItem from="1750408322836" duration="5463000" />
+      <workItem from="1750413397180" duration="49000" />
+      <workItem from="1750570100627" duration="1041000" />
+      <workItem from="1750571774164" duration="373000" />
+      <workItem from="1750572164182" duration="74000" />
+      <workItem from="1750583503325" duration="693000" />
+      <workItem from="1750584216440" duration="485000" />
+      <workItem from="1750593879211" duration="41000" />
+      <workItem from="1750682225447" duration="34000" />
+      <workItem from="1751126830634" duration="1224000" />
+      <workItem from="1751130147269" duration="3397000" />
+      <workItem from="1751136831539" duration="645000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
